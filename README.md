@@ -1,2 +1,2 @@
 # game-multiplayer
-um game multiplayer facilmente adaptavel
+ A really simple and adaptive multiplayer game.
