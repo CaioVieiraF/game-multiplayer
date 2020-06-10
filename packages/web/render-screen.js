@@ -1,12 +1,12 @@
 const renderScreen = (gameFrame, game, requestAnimationFrame) => {
     const context = gameFrame.getContext('2d');
 
-    context.fillStyle = 'white';
+    context.fillStyle = '#09090c';
     context.clearRect(0, 0, gameFrame.width, gameFrame.height);
 
     for (const playerId in game.state.players) {
         const player = game.state.players[playerId];
-        context.fillStyle = 'black';
+        context.fillStyle = '#40d0e0';
         context.fillRect(player.x, player.y, 1, 1);
     };
 

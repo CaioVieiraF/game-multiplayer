@@ -2,7 +2,7 @@ import createKeyboardListener from './keyboard-listener.js';
 import createGame from './create-game.js';
 import renderScreen from './render-screen.js';
 
-function main() {
+const main = () => {
     const gameFrame = document.getElementById('screen');
 
     const game = createGame(gameFrame);
@@ -16,4 +16,4 @@ function main() {
 
 };
 
-main();
+export default main;
