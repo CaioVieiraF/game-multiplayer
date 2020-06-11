@@ -13,14 +13,15 @@
             import createGame from './create-game.js';
             import renderScreen from './render-screen.js';
 
-            const game = createGame();
+            const gameFrame = document.getElementById('screen');
+
+            const game = createGame(gameFrame);
             const keyboardListener = createKeyboardListener(document);
             const socket = io();
 
             socket.on('connect', () => {
                 const playerId = socket.id;
 
-                const gameFrame = document.getElementById('screen');
                 renderScreen(gameFrame, game, requestAnimationFrame, playerId);
             });
 
@@ -31,7 +32,7 @@
                 keyboardListener.registerPlayer(playerId);
                 keyboardListener.subscribe(game.movePlayer);
                 keyboardListener.subscribe( command => {
-                    socket.emit(command.type, command);
+                    socket.emit('move-player', command);
                 });
             });
 
@@ -41,6 +42,7 @@
 
             socket.on('remove-player', command => {
                 game.removePlayer(command);
+                keyboardListener.unsubscribe(game.movePlayer);
             });
 
             socket.on('move-player', command => {
@@ -51,6 +53,13 @@
                 };
             });
 
+            socket.on('add-fruit', command => {
+                game.addFruit(command);
+            });
+
+            socket.on('remove-fruit', command => {
+                game.removeFruit(command);
+            });
 
         </script>
     </body>

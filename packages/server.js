@@ -10,7 +10,8 @@ const sockets = socketio(server);
 
 app.use(express.static('game'));
 
-const game = createGame();
+const game = createGame({ width:10, height:10 });
+game.start();
 
 game.subscribe( command => {
     sockets.emit(command.type, command);

@@ -1,22 +1,25 @@
-const createGame = () => {
+
+const createGame = (gameFrame) => {
+
     const state = {
         players: {},
         fruits: {},
-        screen: {
-            width: 10,
-            height: 10
-        }
     };
 
     const observers = [];
 
+    function start() {
+        const frequency = 2000;
+        setInterval(addFruit, frequency);
+    };
+
     function setState(newState) {
         Object.assign(state, newState);
-    }
+    };
 
     function subscribe(observerFunction) {
         observers.push(observerFunction);
-    }
+    };
 
     function notifyAll(command) {
         for (const observerFunction of observers) {
@@ -26,12 +29,13 @@ const createGame = () => {
 
     function addPlayer(command) {
         const playerId = command.playerId;
-        const playerX = 'playerX' in command ? command.playerX : Math.floor(Math.random() * state.screen.width);
-        const playerY = 'playerY' in command ? command.playerY : Math.floor(Math.random() * state.screen.height);
+        const playerX = 'playerX' in command ? command.playerX : Math.floor(Math.random() * gameFrame.width);
+        const playerY = 'playerY' in command ? command.playerY : Math.floor(Math.random() * gameFrame.height);
 
         state.players[playerId] = {
             x: playerX,
-            y: playerY
+            y: playerY,
+            points: 0
         };
 
         notifyAll({
@@ -55,8 +59,8 @@ const createGame = () => {
 
     function addFruit(command) {
         const fruitId = command ? command.fruitX : Math.floor(Math.random() * 10000000);
-        const fruitX = command ? command.fruitX : Math.floor(Math.random() * state.screen.width);
-        const fruitY = command ? command.fruitY : Math.floor(Math.random() * state.screen.heght);
+        const fruitX = command ? command.fruitX : Math.floor(Math.random() * gameFrame.width);
+        const fruitY = command ? command.fruitY : Math.floor(Math.random() * gameFrame.height);
 
         state.fruits[fruitId] = {
             x: fruitX,
@@ -75,6 +79,11 @@ const createGame = () => {
         const fruitId = command.fruitId;
 
         delete state.fruits[fruitId];
+
+        notifyAll({
+            type: 'remove-fruit',
+            fruitId
+        });
     };
 
     function movePlayer(command) {
@@ -88,13 +97,13 @@ const createGame = () => {
                 player.y = Math.max(player.y - 1, 0);
             },
             'ArrowDown': player => {
-                player.y = Math.min(player.y + 1, state.screen.height - 1);
+                player.y = Math.min(player.y + 1, gameFrame.height - 1);
             },
             'ArrowLeft': player => {
                 player.x = Math.max(player.x - 1, 0);
             },
             'ArrowRight': player => {
-                player.x = Math.min(player.x + 1, state.screen.width - 1);
+                player.x = Math.min(player.x + 1, gameFrame.width - 1);
             }
         };
 
@@ -110,6 +119,7 @@ const createGame = () => {
             const fruit = state.fruits[fruitId];
             if (player.x === fruit.x && player.y === fruit.y) {
                 removeFruit({ fruitId });
+                player.points++;
             };
         };
     };
@@ -122,6 +132,7 @@ const createGame = () => {
         movePlayer,
         state,
         setState,
+        start,
         subscribe
     };
 };

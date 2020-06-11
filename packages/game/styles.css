@@ -6,6 +6,7 @@ body{
 canvas{
     display: block;
     margin: auto;
+    margin-top: 50px;
     border: 5px solid #09090c;
     border-radius: 5px;
     background: #09090c;

@@ -14,6 +14,10 @@ const createKeyboardListener = (document) => {
         state.observers.push(observerFunction);
     }
 
+    function unbscribe(observerFunction) {
+        delete state.observers[observerFunction];
+    }
+
     function notifyAll(command) {
         for (const observerFunction of state.observers) {
             observerFunction(command);
@@ -34,6 +38,7 @@ const createKeyboardListener = (document) => {
 
     return {
         subscribe,
+        unbscribe,
         registerPlayer
     };
 
