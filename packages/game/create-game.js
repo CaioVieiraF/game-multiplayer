@@ -1,35 +1,74 @@
-const createGame = (gameFrame) => {
+const createGame = () => {
     const state = {
         players: {},
-        fruits: {}
+        fruits: {},
+        screen: {
+            width: 10,
+            height: 10
+        }
+    };
+
+    const observers = [];
+
+    function setState(newState) {
+        Object.assign(state, newState);
+    }
+
+    function subscribe(observerFunction) {
+        observers.push(observerFunction);
+    }
+
+    function notifyAll(command) {
+        for (const observerFunction of observers) {
+            observerFunction(command);
+        };
     };
 
     function addPlayer(command) {
         const playerId = command.playerId;
-        const playerX = command.playerX;
-        const playerY = command.playerY;
+        const playerX = 'playerX' in command ? command.playerX : Math.floor(Math.random() * state.screen.width);
+        const playerY = 'playerY' in command ? command.playerY : Math.floor(Math.random() * state.screen.height);
 
         state.players[playerId] = {
             x: playerX,
             y: playerY
         };
+
+        notifyAll({
+            type: 'add-player',
+            playerId,
+            playerX,
+            playerY
+        });
     };
 
     function removePlayer(command) {
         const playerId = command.playerId;
 
         delete state.players[playerId];
+
+        notifyAll({
+            type: 'remove-player',
+            playerId
+        });
     };
 
     function addFruit(command) {
-        const fruitId = command.fruitId;
-        const fruitX = command.fruitX;
-        const fruitY = command.fruitY;
+        const fruitId = command ? command.fruitX : Math.floor(Math.random() * 10000000);
+        const fruitX = command ? command.fruitX : Math.floor(Math.random() * state.screen.width);
+        const fruitY = command ? command.fruitY : Math.floor(Math.random() * state.screen.heght);
 
         state.fruits[fruitId] = {
             x: fruitX,
             y: fruitY
         };
+
+        notifyAll({
+            type: 'add-fruit',
+            fruitId,
+            fruitX,
+            fruitY
+        });
     };
 
     function removeFruit(command) {
@@ -39,6 +78,7 @@ const createGame = (gameFrame) => {
     };
 
     function movePlayer(command) {
+        notifyAll(command);
 
         const keyPressed = command.keyPressed;
         const player = state.players[command.playerId];
@@ -48,13 +88,13 @@ const createGame = (gameFrame) => {
                 player.y = Math.max(player.y - 1, 0);
             },
             'ArrowDown': player => {
-                player.y = Math.min(player.y + 1, gameFrame.height - 1);
+                player.y = Math.min(player.y + 1, state.screen.height - 1);
             },
             'ArrowLeft': player => {
                 player.x = Math.max(player.x - 1, 0);
             },
             'ArrowRight': player => {
-                player.x = Math.min(player.x + 1, gameFrame.width - 1);
+                player.x = Math.min(player.x + 1, state.screen.width - 1);
             }
         };
 
@@ -80,7 +120,9 @@ const createGame = (gameFrame) => {
         addFruit,
         removeFruit,
         movePlayer,
-        state
+        state,
+        setState,
+        subscribe
     };
 };
 
